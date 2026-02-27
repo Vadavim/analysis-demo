@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "analysis-demo"
+dynamic = ["version"]
+dependencies = [
+    "jupyterlab",
+    "plotly",
+    "scipy",
+    "pandas",
+    "polars",
+    "ipykernel",
+    "numpy",
+    "nbformat",
+    "streamlit",
+    "scikit-learn"
+]
+[project.scripts]
+run-jsr-server = "jsr.main:run"
+
+[tool.setuptools]
+packages = ["jsr"]
