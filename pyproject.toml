@@ -8,6 +8,7 @@ dynamic = ["version"]
 dependencies = [
     "jupyterlab",
     "plotly",
+    "kaleido",
     "scipy",
     "pandas",
     "polars",
