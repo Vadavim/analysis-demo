@@ -22,3 +22,6 @@ class Trans:
     # Added feature
     FEAT_DURATION = "DURATION"
     FEAT_SHIFT_ID = "SHIFT_ID"
+    FEAT_SHIFT_START = "SHIFT_START"
+
+

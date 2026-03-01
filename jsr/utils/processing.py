@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 from jsr.utils.col_namespace import Sched, Trans, Ship
 import polars as pl
@@ -74,8 +74,11 @@ def _process_transactions(data_folder_loc: str, csv_filename: str,
 
     # Add a new feature: shift ID of shift working during start of transaction
     l_transaction_start_times = df[Trans.START_TIME].to_list()
-    shift_ids = _find_shift_ids(l_transaction_start_times, df_schedule)
-    df = df.with_columns(pl.Series(Trans.FEAT_SHIFT_ID, shift_ids))
+    shift_ids, shift_starts = _find_shift_ids(l_transaction_start_times, df_schedule)
+    df = df.with_columns(
+        pl.Series(Trans.FEAT_SHIFT_ID, shift_ids),
+        pl.Series(Trans.FEAT_SHIFT_START, shift_starts),
+    )
     return df
 
 def _process_shipments(data_folder_loc: str,
@@ -88,7 +91,7 @@ def _process_shipments(data_folder_loc: str,
 
     # New feature: Joint shift id (A&B or C&D) that took place during shipment
     l_shipment_dates = df[Ship.SHIP_DATE].to_list()
-    shift_ids = _find_shift_ids(l_shipment_dates, df_schedule)
+    shift_ids, shift_starts = _find_shift_ids(l_shipment_dates, df_schedule)
     remap = dict(A="AB", B="AB", C="CD", D="CD")
     shift_ids = [remap[i] for i in shift_ids]
     df = df.with_columns(pl.Series(Ship.FEAT_SHIFT_ID, shift_ids))
@@ -109,15 +112,16 @@ def _find_shift_ids(events: List[datetime.datetime],
         because it iterates over all schedule times for each event.
     """
     shift_list = df_schedule.to_struct().to_list()
-    shift_ids = [_find_shift_id(event, shift_list) for event in events]
-    return shift_ids
+    results = [_find_shift_id(event, shift_list) for event in events]
+    shift_ids, shift_starts = zip(*results)
+    return shift_ids, shift_starts
 
-def _find_shift_id(event: datetime.datetime, shift_list: List[Dict]) -> Any | None:
+def _find_shift_id(event: datetime.datetime, shift_list: List[Dict]) -> Tuple[str, datetime.datetime] | None:
     """ Helper function for _find_shift_ids
     """
     for shift in shift_list:
         start, end, shift_id = shift["SHIFT_START"], shift["SHIFT_END"], shift["SHIFT_ID"]
         if event < end and event >= start:
-            return shift_id
+            return (shift_id, start)
 
 
