@@ -1,18 +1,14 @@
 import polars as pl
 from polars import col
 from polars import selectors as cs
-import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
-import plotly.figure_factory as ff
-import time
-import numpy as np
-from jsr.utils.processing import process_dataframes, _find_shift_ids
 from jsr.utils.col_namespace import Sched, Ship, Trans
-from plotly.subplots import make_subplots
+from jsr.utils.plotting import plot_write_image
 
 
-def ship_plot_total_value_over_time(df_shipments: pl.DataFrame):
+def ship_plot_total_value_over_time(df_shipments: pl.DataFrame,
+                                    write_image=False):
 
     # Extract Total values and mean time (for red hline)
     total_values_by_day = (
@@ -27,15 +23,19 @@ def ship_plot_total_value_over_time(df_shipments: pl.DataFrame):
     fig = px.bar(total_values_by_day, x=Ship.SHIP_DATE, y="total_value",
                  template="seaborn")
     fig.update_layout(
-        xaxis_title="Day", xaxis_title_font_size=20,
-        yaxis_title="Total", yaxis_title_font_size=20,
-        title="Total Daily Value of Shipments", title_font_size=25
+        margin=dict(l=20, r=20, t=40, b=30),
+        xaxis_title="Day", xaxis_title_font_size=26,
+        yaxis_title="Total", yaxis_title_font_size=26,
+        title="Total Daily Value of Shipments",
+        title_y=0.99,
+        title_font_size=32,
+        font_family="Overpass"
     )
 
     # Annotation - "Average" Box
     fig.add_annotation(
         xref="paper",
-        x=1.12,
+        x=1,
         y=mean_value,
         xanchor="right",
         text="Average",
@@ -51,5 +51,37 @@ def ship_plot_total_value_over_time(df_shipments: pl.DataFrame):
 
     # HLine - average value
     fig.add_hline(y=mean_value, line_dash="dash", line_color="red", line_width=2)
+
+    if write_image:
+        plot_write_image(fig, output_name="ship_plot_total_value_over_time")
+
+    fig.update_xaxes(title_standoff=2)
+    fig.update_yaxes(title_standoff=2)
+    # fig.add_vline(
+    #     x=0,  # left edge of plotting area
+    #     xref="paper",
+    #     line_width=6,  # ← fixed pixel thickness — looks same at any scale/zoom/export
+    #     line_color="#333333",
+    #     layer="above"
+    # )
+    # fig.add_shape(
+    #     type="rect", xref="paper", yref="paper",
+    #     x0=-0.055, x1=-.055,
+    #     y0=0.25, y1=0.75,
+    #     fillcolor="black",
+    #     line_width=1,
+    #     opacity=1.0,
+    #     layer="above"
+    # )
+
+    # fig.add_shape(
+    #     type="rect", xref="paper", yref="paper",
+    #     x0=0.25, x1=0.75,
+    #     y0=-0.12, y1=-0.12,
+    #     fillcolor="black",
+    #     line_width=1,
+    #     opacity=1.0,
+    #     layer="above"
+    # )
 
     return fig
