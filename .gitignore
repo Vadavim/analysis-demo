@@ -1,3 +1,12 @@
+# Custom ignore
+data/*
+!data/.gitkeep
+notebooks/*
+
+
+
+
+# --- Default Python .gitignore from GitHub ---
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
