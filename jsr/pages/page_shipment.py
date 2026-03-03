@@ -7,13 +7,13 @@ import polars as pl
 
 st.title("Shipment Summary")
 
-dataframes = get_dataframes()
+dataframes = get_dataframes() # persistent state
 df_shipments = dataframes["shipments"]
 
-
-# Col 1 -> Radio Buttons; Col 2 -> Plot
 top_container = st.container()
 bottom_container = st.container()
+
+# Col 1 -> Radio Buttons; Col 2 -> Plot
 with top_container:
     col1, col2 = st.columns(2)
 with col1:
@@ -32,9 +32,11 @@ with col2:
 remap_dict = {"All Shipments": None, "Order Line ID": Ship.ORDER_LINE_ID}
 radio_category = remap_dict[radio_category]
 
+# Chart and dataframe
 with top_container:
     tab_chart, tab_df = st.tabs(["Chart", "Dataframe"])
 
+# Filter multisect for ORDER_LINE_ID
 with bottom_container:
     sorted_order_line_ids = df_shipments[Ship.ORDER_LINE_ID].unique().sort().to_list()
     options = st.multiselect(
@@ -47,6 +49,7 @@ with bottom_container:
         .filter(pl.col(Ship.ORDER_LINE_ID).is_in(options))
     )
 
+# Display tabs
 with tab_chart:
     chart, value_summary_df = create_shipment_value_summary(filtered_df_shipments,
                                   summary_type=radio_summary,
@@ -54,6 +57,3 @@ with tab_chart:
 with tab_df:
     st.dataframe(value_summary_df)
 
-# group_columns = st.multiselect("Select columns to group by", options=[Ship.ORDER_ID, Ship.ORDER_LINE_ID])
-# if group_columns:
-#     st.dataframe(df_shipments.group_by(group_columns).agg(pl.col(Ship.VALUE).mean()))

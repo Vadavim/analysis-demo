@@ -1,20 +1,18 @@
 import streamlit as st
 from jsr.streamlit_components.components_general import component_time_picker, get_dataframes
 from jsr.streamlit_components.components_operator import create_transaction_summary_by_shift
-from jsr.utils.plotting import default_figure_settings
 from jsr.utils.col_namespace import *
 import polars as pl
 from datetime import datetime, timedelta, date
-import plotly.express as px
-
 
 st.title("Transaction Overview")
-dataframes = get_dataframes()
+dataframes = get_dataframes() # persistent state
 df_transactions = dataframes["transactions"]
 
 top_container = st.container()
 bottom_container = st.container()
 
+# Top layout for options
 with top_container:
     col1, col2, col3, col4 = st.columns(4)
 
@@ -49,8 +47,6 @@ with col3:
         options=["All Transactions", "Case Pick",
                  "Replenishment", "Pallet Pick", "Putaway Pallet"]
     )
-    # if transaction_type == "All Transactions":
-    #     transaction_type = None
 
 # Col 4 -> Summary Picker
 with col4:
@@ -59,6 +55,7 @@ with col4:
         options=["# of Transactions", "# of Operators"]
     )
 
+# Bottom layout for chart and dataframe
 with bottom_container:
     tab_chart, tab_df = st.tabs(["Chart", "Dataframe"])
 
@@ -66,3 +63,6 @@ with tab_chart:
     chart, dataframe = create_transaction_summary_by_shift(
         filtered_df, summary_type=summary_type,
         filter_category=transaction_type)
+
+with tab_df:
+    st.dataframe(dataframe)

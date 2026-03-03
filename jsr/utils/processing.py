@@ -139,6 +139,9 @@ def _find_shift_id(event: datetime.datetime, shift_list: List[Dict]) -> Tuple[st
             return (shift_id, start)
 
 def create_freq_map(df_transactions: pl.DataFrame,):
+    """ Clunky way of getting transaction frequencies by operator. Should have added group index instead
+    of using map_groups...
+    """
     def map_transaction_freq_by_op(group_df):
         key = group_df[Trans.START_TIME].first()
         by_op = group_df.group_by(Trans.OPERATOR_ID)

@@ -1,9 +1,12 @@
 import streamlit as st
+
+from jsr.streamlit_components.components_general import get_dataframes
 from jsr.utils.processing import process_dataframes
 
-if "dataframes" not in st.session_state:
-    st.session_state.dataframes = process_dataframes("data/")
+# Persistent state
+dataframes = get_dataframes()
 
+# Defining pages
 pages = {
     "Description": [
         st.Page("pages/description.py", title="Overview", icon=":material/description:")

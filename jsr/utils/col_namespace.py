@@ -1,9 +1,13 @@
 class Sched:
+    """ Provides constant str values for columns in SHIFT_SCHEDULE.csv
+    """
     SHIFT_START = "SHIFT_START"
     SHIFT_END = "SHIFT_END"
     SHIFT_ID = "SHIFT_ID"
 
 class Ship:
+    """ Provides constant str values for columns in WAREHOUSE_SHIPMENTS.csv
+    """
     SHIP_DATE = "SHIP_DATE"
     ORDER_ID = "ORDER_ID"
     ORDER_LINE_ID = "ORDER_LINE_ID"
@@ -13,6 +17,8 @@ class Ship:
     FEAT_SHIFT_ID = "SHIFT_ID"
 
 class Trans:
+    """ Provides constant str values for columns in WAREHOUSE_TRANSACTIONS.csv
+    """
     START_TIME = "START_TIME"
     END_TIME = "END_TIME"
     OPERATOR_ID = "OPERATOR_ID"

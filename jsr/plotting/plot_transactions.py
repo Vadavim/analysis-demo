@@ -8,7 +8,15 @@ from jsr.utils.col_namespace import Sched, Ship, Trans
 from jsr.utils.plotting import plot_write_image, default_figure_settings
 
 
-def ship_demo1_transaction_schedule(df_transactions: pl.DataFrame, write_image=False):
+def ship_demo1_transaction_schedule(df_transactions: pl.DataFrame, write_image=False) -> go.Figure:
+    """ Show timeline plot of operator schedules, colored by shift ID
+    Args:
+        df_transactions: Transactions DataFrame
+        write_image: If true, write image to disk
+
+    Returns:
+        Plotly figure
+    """
     filtered_df = (
         df_transactions
         .filter(col(Trans.START_TIME).dt.day() == 14)
@@ -16,6 +24,8 @@ def ship_demo1_transaction_schedule(df_transactions: pl.DataFrame, write_image=F
         .sort("OPERATOR_ID")
         .with_columns(col(Trans.OPERATOR_ID).cast(str))
     )
+
+    # Enforce operator order (based on Shift ID)
     operator_order = filtered_df.sort(Trans.FEAT_SHIFT_ID)[Trans.OPERATOR_ID].unique(maintain_order=True).to_list()
 
     fig = px.timeline(filtered_df, x_start="START_TIME",
@@ -27,6 +37,7 @@ def ship_demo1_transaction_schedule(df_transactions: pl.DataFrame, write_image=F
     default_figure_settings(fig,
                             x_label="Time", y_label="Operator ID", title="Shift Breakdown for Nov 14th")
 
+    # Shift changeover times
     fig.add_vline(x=datetime.datetime(2020, 11, 14, 19), line_dash="dash", line_color="black", line_width=1)
     fig.add_vline(x=datetime.datetime(2020, 11, 14, 7), line_dash="dash", line_color="black", line_width=1)
     fig.update_layout(
@@ -40,7 +51,16 @@ def ship_demo1_transaction_schedule(df_transactions: pl.DataFrame, write_image=F
         plot_write_image(fig, output_name="transaction_by_shift_on_nov_14th")
     return fig
 
-def ship_demo2_transaction_schedule(df_transactions: pl.DataFrame, write_image=False):
+def ship_demo2_transaction_schedule(df_transactions: pl.DataFrame, write_image=False) -> go.Figure:
+    """ Show timeline plot of operator schedules, colored by transaction type
+
+    Args:
+        df_transactions: Transactions DataFrame
+        write_image: If true, write image to disk
+
+    Returns:
+        Plotly figure
+    """
     filtered_df = (
         df_transactions
         .filter(col(Trans.START_TIME).dt.day() == 14)
@@ -48,6 +68,8 @@ def ship_demo2_transaction_schedule(df_transactions: pl.DataFrame, write_image=F
         .sort("OPERATOR_ID")
         .with_columns(col(Trans.OPERATOR_ID).cast(str))
     )
+
+    # Enforce operator order (based on Shift ID)
     operator_order = filtered_df.sort(Trans.FEAT_SHIFT_ID)[Trans.OPERATOR_ID].unique(maintain_order=True).to_list()
 
     fig = px.timeline(filtered_df, x_start="START_TIME",
@@ -60,6 +82,7 @@ def ship_demo2_transaction_schedule(df_transactions: pl.DataFrame, write_image=F
     default_figure_settings(fig,
                             x_label="Time", y_label="Operator ID", title="Transaction Type Breakdown for Nov 14th")
 
+    # Shift changeover times
     fig.add_vline(x=datetime.datetime(2020, 11, 14, 19), line_dash="dash", line_color="black", line_width=1)
     fig.add_vline(x=datetime.datetime(2020, 11, 14, 7), line_dash="dash", line_color="black", line_width=1)
 
@@ -74,7 +97,15 @@ def ship_demo2_transaction_schedule(df_transactions: pl.DataFrame, write_image=F
         plot_write_image(fig, output_name="transaction_by_type_on_nov_14th")
     return fig
 
-def ship_demo_outlier(df_transactions: pl.DataFrame, write_image=False):
+def ship_demo_outlier(df_transactions: pl.DataFrame, write_image=False) -> go.Figure:
+    """ Shows an example of a day with an unusually long transaction
+    Args:
+        df_transactions:  Transactions DataFrame
+        write_image:  If true, write image to disk
+
+    Returns:
+        Plotly figure
+    """
     filtered_df = (
         df_transactions
         .filter(col(Trans.START_TIME).dt.day() == 24)

@@ -1,6 +1,5 @@
 import polars as pl
 from polars import col
-from polars import selectors as cs
 import plotly.graph_objects as go
 import plotly.express as px
 from jsr.utils.col_namespace import Sched, Ship, Trans
@@ -8,7 +7,15 @@ from jsr.utils.plotting import plot_write_image
 
 
 def ship_plot_total_value_over_time(df_shipments: pl.DataFrame,
-                                    write_image=False):
+                                    write_image=False) -> go.Figure:
+    """ Shows total summary of shipment values for each day in the data
+    Args:
+        df_shipments: Shipments dataframe
+        write_image: If True, write image to file
+
+    Returns:
+        Plotly figure
+    """
 
     # Extract Total values and mean time (for red hline)
     total_values_by_day = (
@@ -60,7 +67,15 @@ def ship_plot_total_value_over_time(df_shipments: pl.DataFrame,
     return fig
 
 def ship_plot_max_value_over_time(df_shipments: pl.DataFrame,
-                                    write_image=False):
+                                    write_image=False) -> go.Figure:
+    """ Shows summary of maximum shipment value for each day in the data
+    Args:
+        df_shipments: Shipments dataframe
+        write_image: If True, write image to file
+
+    Returns:
+        Plotly figure
+    """
 
     # Extract Total values and mean time (for red hline)
     total_values_by_day = (

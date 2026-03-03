@@ -6,12 +6,10 @@ import polars as pl
 
 st.title("Operator Timeline")
 
-dataframes = get_dataframes()
+dataframes = get_dataframes() # persistent state
 df_transactions = dataframes["transactions"]
 
-
-
-# For ordering top and bottom components
+# For ordering components
 top_container = st.container()
 middle_container = st.container()
 bottom_container = st.container()
