@@ -16,10 +16,9 @@ dependencies = [
     "numpy",
     "nbformat",
     "streamlit",
-    "scikit-learn"
+    "scikit-learn",
+    "sktime"
 ]
-[project.scripts]
-run-jsr-server = "jsr.main:run"
 
 [tool.setuptools]
 packages = ["jsr"]

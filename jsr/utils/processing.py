@@ -83,9 +83,9 @@ def _process_transactions(data_folder_loc: str, csv_filename: str,
     # Add a new feature: gap (between successive transactions in a shift)
     def get_gap(group_df):
         group_df = group_df.sort(Trans.START_TIME)
-        group_df = group_df.with_columns(
-            gap=pl.col(Trans.START_TIME).shift(-1) - pl.col(Trans.END_TIME)
-        )
+        gap = (pl.col(Trans.START_TIME).shift(-1) - pl.col(Trans.END_TIME)).alias(Trans.FEAT_GAP)
+        # gap = gap.fill_null(0)
+        group_df = group_df.with_columns(gap.dt.total_seconds())
         return group_df
 
     df = (
@@ -141,19 +141,27 @@ def _find_shift_id(event: datetime.datetime, shift_list: List[Dict]) -> Tuple[st
 def create_freq_map(df_transactions: pl.DataFrame,):
     def map_transaction_freq_by_op(group_df):
         key = group_df[Trans.START_TIME].first()
+        by_op = group_df.group_by(Trans.OPERATOR_ID)
+        mean_duration = by_op.agg(pl.col(Trans.FEAT_DURATION).mean()).to_series()
+        mean_gap = by_op.agg(pl.col(Trans.FEAT_GAP).mean()).to_series()
         k = group_df.select(
-            group_df.group_by(Trans.OPERATOR_ID).len(name="count"),
-            group_df.group_by(Trans.OPERATOR_ID).mean(name="count"),
+            by_op.len(name="count"),
+            mean_duration = mean_duration,
+            mean_gap = mean_gap
         )
         k = k.with_columns(pl.lit(key).alias("time"))
         return k
+
     df = (
         df_transactions
         .sort(Trans.START_TIME)
         .group_by_dynamic(Trans.START_TIME, every="1d")
         .map_groups(map_transaction_freq_by_op, schema=None)
         .group_by(Trans.OPERATOR_ID)
-        .agg(count=pl.col("count"))
-    )
+        # collect into lists for use in streamlit charts
+        .agg(count=pl.col("count"),
+             mean_duration=pl.col("mean_duration"),
+             mean_gap=pl.col("mean_gap")
+    ))
     return df
 

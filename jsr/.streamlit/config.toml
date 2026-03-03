@@ -1,0 +1,8 @@
+[theme]
+#base = "light"
+#backgroundColor = "#EAEAEA"        
+#textColor = "#000000"
+
+# Optional extras
+#primaryColor = "#4CAF50"           # accent color for buttons etc.
+#secondaryBackgroundColor = "#f0f2f6"  # for code blocks, expanders, etc.

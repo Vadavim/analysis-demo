@@ -57,31 +57,35 @@ def ship_plot_total_value_over_time(df_shipments: pl.DataFrame,
 
     fig.update_xaxes(title_standoff=2)
     fig.update_yaxes(title_standoff=2)
-    # fig.add_vline(
-    #     x=0,  # left edge of plotting area
-    #     xref="paper",
-    #     line_width=6,  # ← fixed pixel thickness — looks same at any scale/zoom/export
-    #     line_color="#333333",
-    #     layer="above"
-    # )
-    # fig.add_shape(
-    #     type="rect", xref="paper", yref="paper",
-    #     x0=-0.055, x1=-.055,
-    #     y0=0.25, y1=0.75,
-    #     fillcolor="black",
-    #     line_width=1,
-    #     opacity=1.0,
-    #     layer="above"
-    # )
+    return fig
 
-    # fig.add_shape(
-    #     type="rect", xref="paper", yref="paper",
-    #     x0=0.25, x1=0.75,
-    #     y0=-0.12, y1=-0.12,
-    #     fillcolor="black",
-    #     line_width=1,
-    #     opacity=1.0,
-    #     layer="above"
-    # )
+def ship_plot_max_value_over_time(df_shipments: pl.DataFrame,
+                                    write_image=False):
 
+    # Extract Total values and mean time (for red hline)
+    total_values_by_day = (
+        df_shipments
+        .sort(Ship.SHIP_DATE)
+        .group_by_dynamic(Ship.SHIP_DATE, every="1d")
+        .agg(max_value=col(Ship.VALUE).max().alias("Max Value"))
+    )
+
+    # Initial bar chart
+    fig = px.bar(total_values_by_day, x=Ship.SHIP_DATE, y="max_value",
+                 template="seaborn")
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=40, b=30),
+        xaxis_title="Day", xaxis_title_font_size=26,
+        yaxis_title="Total", yaxis_title_font_size=26,
+        title="Max Daily Value of Shipments",
+        title_y=0.99,
+        title_font_size=32,
+        font_family="Overpass"
+    )
+
+    if write_image:
+        plot_write_image(fig, output_name="ship_plot_max_value_over_time")
+
+    fig.update_xaxes(title_standoff=2)
+    fig.update_yaxes(title_standoff=2)
     return fig

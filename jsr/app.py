@@ -1,22 +1,30 @@
 import streamlit as st
-import pandas
-import os
-from jsr.utils.processing import process_dataframes, create_freq_map
+from jsr.utils.processing import process_dataframes
 
+if "dataframes" not in st.session_state:
+    st.session_state.dataframes = process_dataframes("data/")
 
+pages = {
+    "Description": [
+        st.Page("pages/description.py", title="Overview", icon=":material/description:")
+    ],
+    "Shipments": [
+        st.Page("pages/page_shipment.py", title="Shipment Explorer", icon=":material/analytics:"),
+    ],
 
-dataframes = process_dataframes("data/")
-df_schedule = dataframes["schedule"]
-df_shipments = dataframes["shipments"]
-df_transactions = dataframes["transactions"]
+    "Transactions & Operators": [
+        st.Page("pages/page_operator_timeline.py", title="Operator Timelines", icon=":material/timeline:"),
+        st.Page("pages/page_transaction_overview.py", title="Transaction Overview", icon=":material/forklift:")
+    ],
 
-st.title("Test")
-st.markdown(
-    """ 
-    This is a test
-    """
-)
-# p = test_plot()
-# st.plotly_chart(p)
+    "[Incomplete]": [
+        st.Page("pages/page_operator.py", title="Operator Stats", icon=":material/group:")
+    ]
+
+}
+
+pg = st.navigation(pages, position="sidebar")
+pg.run()
+
 
 
