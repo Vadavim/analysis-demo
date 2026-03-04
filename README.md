@@ -24,10 +24,13 @@ source source.sh
 You should see (.env) next to your command line prompt if successful.
 
 ## Option 2: Manual installation
-While in a venv in the root directory of the project, you can run:
+While in the root directory of the project, you can run:
 ```
-pip install .
+  python3 -m venv .env
+  source .env/bin/activate
+  pip3 install -e .
 ```
+(you may need to replace python3 and pip3 in the commands with python and pip depending on your python installation)
 
 ## Data Folder
 The data required for this demonstration is not included. You will need to move them into the `data/` direction. The following files are expected: 
