@@ -33,7 +33,6 @@ def create_transaction_summary_by_shift(df_transactions: pl.DataFrame,
 
     # Apply filters
     if filter_category != "All Transactions":
-        print("Here")
         summary_df = (
             df_transactions
             .filter(pl.col(Trans.TRANSACTION_TYPE) == filter_category)
